@@ -1,0 +1,16 @@
+# cradle:
+#     stack:
+#         - path: "./src"
+#           component: "mst-experiment:lib"
+#         - path: "./app"
+#           component: "mst-experiment:exe:mst-experiment"
+#         - path: "./test"
+#           component: "mst-experiment:test:mst-experiment-tests"
+cradle:
+    cabal:
+        - path: "./src"
+          component: "lib:mst-experiment"
+        - path: "./app"
+          component: "exe:mst-experiment"
+        - path: "./test"
+          component: "test:mst-experiment-tests"
