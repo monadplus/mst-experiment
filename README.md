@@ -4,7 +4,9 @@
 
 Consider a complete, undirected graph with `C(n, 2) = n(n-1)/2` edges. Each edge has a weight, which is a real number chosen uniformly at random on `[0,1]`.
 
-Your goal is to estimate how the expected weight of the minimum spannig tree grows as a function of `n` for such graphs. This will require implementing a minimum spanning tree algorithm as well as procedures that generate the appropiate random graphs.
+Your goal is to estimate how the expected weight of the minimum spanning tree grows as a function of `n` for such graphs. This will require implementing a minimum spanning tree algorithm as well as procedures that generate the appropiate random graphs.
+
+Depending on the algorithm you use and your implementation, you may find that your program uses too much memory when `n` is large. To reduce memory when `n` is large, we suggest the following approach. In this setting, the minimum spanning tree is extremely unlikely to use any edge of weight greater than `k(n)` for some function `k(n)`. We can first estimate `k(n)` by using repeated runs for small values of `n` and then throw away edges of weight larger than `k(n)` when `n` is large. If you use this approach, be sure to explain why throwing away edges in this manner will not lead to a situation where the program finds a spanning tree that is not actually minimal.
 
 Run your program for `n = 16,32,64,128,256,512,1024,2048,4096,8192`, and larger values if your program runs fast enough. Run your program at least five times for each value of `n` and take the average. You should present a table listing the average tree size for the values of `n` that your program runs successfully. What seems to be happenning to the average size of the minimum spanning tree as `n` grows ?
 

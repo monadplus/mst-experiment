@@ -41,20 +41,20 @@ common common-options
                       -Werror=missing-deriving-strategies
 
 Executable mst-experiment
-  import:                common-options
-  main-is:               Main.hs
-  hs-source-dirs:        app
-  -- ghc-options:           -O2 -threaded -rtsopts -fprof-auto "-with-rtsopts=-N -pa -s"
-  ghc-options:           -O2 -threaded -rtsopts "-with-rtsopts=-N"
-  build-depends:      mst-experiment,
-                      optparse-applicative ^>=0.16,
+  import:            common-options
+  main-is:           Main.hs
+  hs-source-dirs:    app
+  -- ghc-options:    -O2 -threaded -rtsopts -fprof-auto "-with-rtsopts=-N -pa -s"
+  ghc-options:       -O2 -threaded -rtsopts "-with-rtsopts=-N"
+  build-depends:     mst-experiment,
+                     optparse-applicative ^>=0.16,
 
 Library
   import:             common-options
   hs-source-dirs:     src
   exposed-modules:    Graph
                       Experiment
-  other-modules:
+  other-modules:      Internal.Mean
   build-depends:      bytestring         ^>=0.10,
                       containers         ^>=0.6,
                       deepseq            ^>=1.4,

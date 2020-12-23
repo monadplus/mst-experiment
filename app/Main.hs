@@ -4,9 +4,24 @@ import Experiment
 import Options.Applicative
 
 main :: IO ()
-main = runExperiment =<< execParser opts
+main = run =<< execParser opts
   where
-    opts = info (configParser <**> helper) fullDesc
+    opts = info (programParser <**> helper) fullDesc
+
+    run (RunExperiment config) = runExperiment config
+    run EstimateK = estimateK
+
+programParser :: Parser ProgramOpts
+programParser = estimateKParser <|> (fmap RunExperiment configParser)
+
+estimateKParser :: Parser ProgramOpts
+estimateKParser =
+  const EstimateK
+    <$> switch
+      ( long "estimate"
+          <> short 'e'
+          <> help "Estimate k(n)"
+      )
 
 configParser :: Parser Config
 configParser =

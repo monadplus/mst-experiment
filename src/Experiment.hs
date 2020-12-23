@@ -1,6 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
@@ -8,14 +7,18 @@
 module Experiment where
 
 import Control.Monad (replicateM)
-import Data.Semigroup
+import Data.Coerce
 import Graph
 import Text.Printf
+import qualified Internal.Mean as Mean
 
-data Config = Config
-  { size :: Int,
-    repetitions :: Int
-  }
+--------------------------------------------------------------
+
+data ProgramOpts = RunExperiment Config | EstimateK
+
+data Config = Config {size :: Int, repetitions :: Int}
+
+--------------------------------------------------------------
 
 runExperiment :: Config -> IO ()
 runExperiment Config {..} = do
@@ -26,17 +29,19 @@ runExperiment Config {..} = do
     oneExperiment :: IO Depth
     oneExperiment = do
       gr <- genGraph size
-      let mst = prim gr
+      let mst = prim' gr
       return $ treeDepth mst
 
-newtype Count a = Count (a, Int)
-  deriving (Semigroup, Monoid) via ((Sum a, Sum Int))
-
-newCount :: a -> Count a
-newCount a = Count (a, 1)
-
-getMean :: Fractional a => Count a -> a
-getMean (Count (acc, n)) = acc / (fromIntegral n)
-
 meanDepth :: [Depth] -> Depth
-meanDepth = round @Double . getMean . foldMap (newCount . fromIntegral . unDepth)
+meanDepth = round @Double . Mean.getMean . foldMap (Mean.new . fromIntegral . unDepth)
+
+--------------------------------------------------------------
+
+estimateK :: IO ()
+estimateK = do
+  -- The smaller the value the bigger the max weight
+  let size = (16 :: Int) -- arbitrary, between 16 and 8196
+  gr <- genGraph size
+  let mst = prim gr
+      w = (coerce $ maxWeight mst) :: Float
+  printf "Maximum weight %.3f of MST\n" w
