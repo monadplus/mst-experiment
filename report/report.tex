@@ -1,0 +1,59 @@
+
+\documentclass[12pt, a4paper]{article}
+
+\input{preamble}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Arnau Abella}
+\lhead{Randomized Algorithms - UPC}
+\rfoot{Page \thepage}
+
+\title{%
+  \vspace{-10ex}
+  RA: An Exploratory Assignment on Minimum Spanning Trees
+}
+\author{%
+  Arnau Abella \\
+  \large{Universitat Polit\`ecnica de Catalunya}
+}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%
+
+\vspace{5ex}
+
+\begin{algorithm}[H]
+  \SetAlgoLined
+  \DontPrintSemicolon
+  % \LinesNumbered
+  \SetKwInput{Input}{Input}
+  \SetKwInput{Output}{Output}
+  \Input{An undirected weighted graph $G = (V,E)$}
+  \Output{The minimum spanning tree of the input graph $G$}
+  \ForEach{$v \in V$}{
+    $key(v) = \infty$\;
+    $parent(v) = NIL$\;
+  }
+  $key(r) = 0$ \tcp*[r]{Pick \textit{u.a.r.} the initial vertex $r \in V$}
+  $Q = V$\;
+  \While{$Q \neq \emptyset$}{
+    $u = EXTRACT-MIN(Q)$\;
+    \ForEach{$v \in ADJ(u)$}{
+      \If{$v \in Q$ and $w(u,v) < key(v)$}{
+        $key(v) = w(u,v)$\;
+        $parent(v) = u$\;
+      }
+    }
+  }
+
+  % \Return{$w$}\;
+  \caption{Minimum Spanning Tree Prim's Algorithm}
+\end{algorithm}
+
+%%%%%%%%%%%%%%%%%%%%
+\end{document}

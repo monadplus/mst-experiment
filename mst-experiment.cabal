@@ -44,17 +44,22 @@ Executable mst-experiment
   import:                common-options
   main-is:               Main.hs
   hs-source-dirs:        app
-  ghc-options:           -O2 -threaded -rtsopts -with-rtsopts=-N
-  build-depends:         base >=4.12 && <4.15
+  -- ghc-options:           -O2 -threaded -rtsopts -fprof-auto "-with-rtsopts=-N -pa -s"
+  ghc-options:           -O2 -threaded -rtsopts "-with-rtsopts=-N"
+  build-depends:      mst-experiment,
+                      optparse-applicative ^>=0.16,
 
 Library
   import:             common-options
   hs-source-dirs:     src
-  exposed-modules:    Lib
+  exposed-modules:    Graph
+                      Experiment
   other-modules:
   build-depends:      bytestring         ^>=0.10,
                       containers         ^>=0.6,
                       deepseq            ^>=1.4,
+                      fgl                ^>=5.7,
+                      mwc-random         ^>=0.15,
                       text               ^>=1.2,
 
 Benchmark mst-experiment-bench
