@@ -30,8 +30,7 @@ programParser =
 runParser :: Parser ProgramOpts
 runParser =
   Run
-    <$> option
-      auto
+    <$> strOption
       ( long "file"
           <> short 'f'
           <> help "Plot output file"

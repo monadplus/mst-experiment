@@ -43,16 +43,31 @@ data ProgramOpts
 -- | Experiment to estimate the upper bound on the weight
 -- of the MST of a complete undirected graph.
 runExperiment :: FilePath -> IO ()
-runExperiment fp = plot fp []
+runExperiment fp = plot fp =<< results
+  where
+    results =
+      traverse
+        singleRun
+        [ Config{ size = 16, repetitions = 20}
+        , Config{ size = 32, repetitions = 20}
+        , Config{ size = 64, repetitions = 20}
+        , Config{ size = 128, repetitions = 20}
+        , Config{ size = 256, repetitions = 10}
+        , Config{ size = 512, repetitions = 5}
+        , Config{ size = 1024, repetitions = 5}
+        , Config{ size = 2048, repetitions = 2}
+        , Config{ size = 4096, repetitions = 1}
+        -- beyond this point it takes too long..
+        ]
 
 --------------------------------------------------------------
 
 -- | Single run of the experiment.
-singleRun :: Config -> IO (Statistics Weight)
+singleRun :: Config -> IO (Int, Statistics Weight)
 singleRun Config {..} = do
   r <- statistics <$> replicateM repetitions oneExperiment
   putStrLn (pretty r)
-  return r
+  return (size, r)
   where
     oneExperiment = do
       gr <- genGraph size
@@ -74,9 +89,9 @@ singleRun Config {..} = do
                 [ Group SingleLine [Header "|V|", Header "|E|", Header "W", Header "Std W"]
                 ]
             )
-            [ [show _n, show edges, show _mean, show _std]
+            [ [show size, show edges, show _mean, show _std]
             ]
-        edges = (fromIntegral $ _n * (_n - 1)) / 2 :: Double
+        edges = (fromIntegral $ size * (size - 1)) / 2 :: Double
 
 --------------------------------------------------------------
 

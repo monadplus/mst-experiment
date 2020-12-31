@@ -29,7 +29,7 @@ statistics = done . foldl' step begin
         n' = n + 1
         mean' = (n * mean + x) / (n + 1)
         delta = x - mean
-        m2' = m2 + delta * delta * delta * n / (n + 1)
+        m2' = m2 + (delta * delta) * n / (n + 1)
 
     done (n, mean, m2) = Statistics (floor n) mean variance std
       where

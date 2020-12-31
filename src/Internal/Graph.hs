@@ -50,6 +50,7 @@ import Data.Graph.Inductive.PatriciaTree (Gr)
 import Data.Kind
 import Data.Semigroup (Max (..), Sum (..))
 import qualified System.Random.MWC as R
+import Graphics.Rendering.Chart.Easy (PlotValue)
 
 -- | Given \( n \), returns a complete undirected graph with \( n \) vertices and \( \binom{n}{2} \) edges.
 newtype UGraph = UGraph {unGraph :: Gr () Weight}
@@ -86,7 +87,7 @@ newtype MST = MST {unTree :: [[(Int, Weight)]]}
   deriving newtype (Show, NFData)
 
 newtype Weight = Weight {unWeight :: Float}
-  deriving newtype (Show, Ord, Eq, Num, Enum, Real, RealFrac, Fractional, Floating, NFData)
+  deriving newtype (Show, Ord, Eq, Num, Enum, Real, RealFrac, Fractional, Floating, RealFloat, NFData, PlotValue)
   deriving (Semigroup, Monoid) via (Sum Float)
 
 instance R.Variate Weight where

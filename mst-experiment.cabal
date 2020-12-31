@@ -48,7 +48,7 @@ Executable mst-experiment
   -- ghc-options:    -O2 -threaded -rtsopts -fprof-auto "-with-rtsopts=-N -pa -s"
   ghc-options:       -O2 -threaded -rtsopts "-with-rtsopts=-N"
   build-depends:     mst-experiment,
-                     optparse-applicative ^>=0.16,
+                     optparse-applicative ^>=0.15,
 
 Library
   import:             common-options
@@ -58,6 +58,8 @@ Library
                         Internal.Plot
                         Internal.Statistics
   build-depends:      bytestring         ^>=0.10,
+                      Chart              ^>=1.9,
+                      Chart-diagrams     ^>=1.9,
                       containers         ^>=0.6,
                       deepseq            ^>=1.4,
                       fgl                ^>=5.7,
