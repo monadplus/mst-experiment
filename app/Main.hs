@@ -1,28 +1,58 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Main where
+
+------------------------------------
 
 import Data.Functor
 import Experiment
 import Options.Applicative
+
+------------------------------------
 
 main :: IO ()
 main = run =<< execParser opts
   where
     opts = info (programParser <**> helper) fullDesc
 
-    run (RunExperiment config) = void $ runExperiment config
-    run EstimateK = estimateK
+    run (Run fp) = runExperiment fp
+    run (SingleRun config) = void $ singleRun config
+    run (EstimateK n) = estimateK n
 
 programParser :: Parser ProgramOpts
-programParser = estimateKParser <|> (fmap RunExperiment configParser)
+programParser =
+  subparser
+    ( command "run" (info (runParser <**> helper) (progDesc "Run the experiment and plot the result."))
+        <> command "single" (info (singleParser <**> helper) (progDesc "Single run on the given graph size."))
+        <> command "estimate" (info (estimateKParser <**> helper) (progDesc "Estimate k(n) for the experiment."))
+    )
+
+runParser :: Parser ProgramOpts
+runParser =
+  Run
+    <$> option
+      auto
+      ( long "file"
+          <> short 'f'
+          <> help "Plot output file"
+          <> metavar "FILE"
+      )
 
 estimateKParser :: Parser ProgramOpts
 estimateKParser =
-  const EstimateK
-    <$> switch
-      ( long "estimate"
-          <> short 'e'
-          <> help "Estimate k(n)"
+  EstimateK
+    <$> option
+      auto
+      ( long "size"
+          <> short 'n'
+          <> value 16
+          <> showDefault
+          <> help "Size of the complete undirected graph"
+          <> metavar "INT"
       )
+
+singleParser :: Parser ProgramOpts
+singleParser = SingleRun <$> configParser
 
 configParser :: Parser Config
 configParser =

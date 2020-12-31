@@ -4,11 +4,21 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Experiment where
+module Experiment
+  ( Config (..),
+    ProgramOpts (..),
+    runExperiment,
+    singleRun,
+    estimateK
+  )
+where
+
+--------------------------------------------------------------
 
 import Control.Monad (replicateM)
 import Data.Coerce
-import Graph
+import Internal.Graph
+import Internal.Plot
 import Internal.Statistics
 import Text.Printf
 import Text.Tabular
@@ -16,14 +26,30 @@ import qualified Text.Tabular.AsciiArt as Ascii
 
 --------------------------------------------------------------
 
-data ProgramOpts = RunExperiment Config | EstimateK
+data Config = Config
+  { size :: Int,
+    repetitions :: Int
+  }
+  deriving stock (Show)
 
-data Config = Config {size :: Int, repetitions :: Int}
+data ProgramOpts
+  = Run FilePath
+  | SingleRun Config
+  | EstimateK Int
+  deriving stock (Show)
 
 --------------------------------------------------------------
 
-runExperiment :: Config -> IO (Statistics Weight)
-runExperiment Config {..} = do
+-- | Experiment to estimate the upper bound on the weight
+-- of the MST of a complete undirected graph.
+runExperiment :: FilePath -> IO ()
+runExperiment fp = plot fp []
+
+--------------------------------------------------------------
+
+-- | Single run of the experiment.
+singleRun :: Config -> IO (Statistics Weight)
+singleRun Config {..} = do
   r <- statistics <$> replicateM repetitions oneExperiment
   putStrLn (pretty r)
   return r
@@ -54,10 +80,11 @@ runExperiment Config {..} = do
 
 --------------------------------------------------------------
 
-estimateK :: IO ()
-estimateK = do
-  -- The smaller the value the bigger the max weight
-  let size = (16 :: Int) -- arbitrary, between 16 and 8196
+-- | Estimation of the function /K(n)/ to reduce the complexity of the experiment.
+--
+-- Note, this function is inverse linear to the number of vertices.
+estimateK :: Int -> IO ()
+estimateK size = do
   gr <- genGraph size
   let mst = prim gr
       w = (coerce $ maxWeight mst) :: Float

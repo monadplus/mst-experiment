@@ -53,9 +53,10 @@ Executable mst-experiment
 Library
   import:             common-options
   hs-source-dirs:     src
-  exposed-modules:    Graph
-                      Experiment
-  other-modules:      Internal.Statistics
+  exposed-modules:    Experiment
+                        Internal.Graph
+                        Internal.Plot
+                        Internal.Statistics
   build-depends:      bytestring         ^>=0.10,
                       containers         ^>=0.6,
                       deepseq            ^>=1.4,

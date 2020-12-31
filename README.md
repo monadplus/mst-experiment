@@ -1,22 +1,13 @@
 # An Exploratory Assignment on Minimum Spanning Trees
 
-## Statement
+## Introduction
 
-Consider a complete, undirected graph with `C(n, 2) = n(n-1)/2` edges. Each edge has a weight, which is a real number chosen uniformly at random on `[0,1]`.
+Let the weight of a tree be the sum of the squares of its edges lengths. Given a set of points `P` in the unit square
+let `W(P)` be the weight of the _minimum spanning tree (MST)_ of `P`, where an edge length is the Euclidean distance between its endpoints. If `P` consist of the four corners of the square, then `W(P)= 3`. _Gilbert_ and _Pollack_ proved that `W(P)` is `O(1)` and this was extended to an arbitrary number of dimensions by _Bern_ and _Eppstein_. While more recent divide-and-conquer approaches have show that `W(P) ≤ 4`, no point set is known with `W(P) > 3`, and hence it has been widely conjectured that `W(P) ≤ 3`. Later it was proved that `W(P) < 3.41`.
 
-Your goal is to estimate how the expected weight of the minimum spanning tree grows as a function of `n` for such graphs. This will require implementing a minimum spanning tree algorithm as well as procedures that generate the appropiate random graphs.
+The objective of this empirical experiment is to check if `W(P) < 3.41` holds. In order to the previous theorem, we uniformaly at random generate points in the unite square `P` and compute the weight of the MST of these points. We do this with an increasing number of points in order to explore the solution space.
 
-Depending on the algorithm you use and your implementation, you may find that your program uses too much memory when `n` is large. To reduce memory when `n` is large, we suggest the following approach. In this setting, the minimum spanning tree is extremely unlikely to use any edge of weight greater than `k(n)` for some function `k(n)`. We can first estimate `k(n)` by using repeated runs for small values of `n` and then throw away edges of weight larger than `k(n)` when `n` is large. If you use this approach, be sure to explain why throwing away edges in this manner will not lead to a situation where the program finds a spanning tree that is not actually minimal.
-
-Run your program for `n = 16,32,64,128,256,512,1024,2048,4096,8192`, and larger values if your program runs fast enough. Run your program at least five times for each value of `n` and take the average. You should present a table listing the average tree size for the values of `n` that your program runs successfully. What seems to be happenning to the average size of the minimum spanning tree as `n` grows ?
-
-In addition, you should write one or two pages discussing your experiments in more depth. The discussion should reflect what you have learned from this assignment and might address the following topics.
-
-* What minimmum spanning tree algorithm did you use, and why?
-* What is the running time of your algorithm?
-* If you chose to throw away edges, how did you determine `k(n)`, and how effective was this approach?
-* Can you give a rought explanation for your results? (The limiting behaviour as `n` grows large can be proven rigorously, but it is very difficult; you need not attempt to prove any exact result.)
-* Did you have any interesting experiences with the random number generator? Do you trust it?
+The results of this experiment can be found in the [report.pdf](./report/report.pdf).
 
 ## Installation
 
@@ -64,18 +55,31 @@ Let's start by showing the available options:
 
 ```sh
 $ cabal run mst-experiment -- --help
-
-Usage: mst-experiment [(-e|--estimate) | (-n|--size INT) [-r|--repetitions INT]]
+Usage: mst-experiment COMMAND
 
 Available options:
-  -e,--estimate            Estimate k(n)
-  -n,--size INT            Size of the complete undirected graph
-  -r,--repetitions INT     Number of repetitions of the experiment (default: 5)
   -h,--help                Show this help text
+
+Available commands:
+  run                      Run the experiment and plot the result.
+  single                   Single run on the given graph size.
+  estimate                 Estimate k(n) for the experiment.
 ```
 
-For example, to run the experiment with a complete undirected graph of 4096 vertices:
+The executable has three options
+
+* run: runs the experiment and plots the result to the given file (this may takes several minutes).
+* single: computes the weight of the MST on the given number of vertices
+* estimate (ignore): internal option that is needed to optimize the runs.
+
+For example, to run the experiment
 
 ```bash
-cabal run mst-experiment --size 4096 --repetitions 1
+cabal run mst-experiment -- run --file "output"
+```
+
+Another example, to run the experiment with a complete undirected graph of 2048 vertices
+
+```bash
+cabal run mst-experiment -- single --size 2048 --repetitions 5
 ```

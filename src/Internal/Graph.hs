@@ -15,7 +15,7 @@
 {-# LANGUAGE NoStarIsType #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
-module Graph
+module Internal.Graph
   ( -- * Graph
     UGraph,
     mkUGraph,
