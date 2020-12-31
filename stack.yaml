@@ -1,2 +1,3 @@
 resolver: lts-16.25 # ghc8.8.4
-extra-deps: []
+extra-deps:
+  - optparse-applicative-0.16.0.0@sha256:de6f2a1be366a1f6db786883c605bbd121bbafbe41c4fff00a306672566b0e7f,4785

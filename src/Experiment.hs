@@ -11,6 +11,9 @@ import Data.Coerce
 import Graph
 import Text.Printf
 import qualified Internal.Mean as Mean
+import Data.Bifunctor
+import Text.Tabular
+import qualified Text.Tabular.AsciiArt as Ascii
 
 --------------------------------------------------------------
 
@@ -20,20 +23,35 @@ data Config = Config {size :: Int, repetitions :: Int}
 
 --------------------------------------------------------------
 
-runExperiment :: Config -> IO ()
+runExperiment :: Config -> IO (Depth, Weight)
 runExperiment Config {..} = do
-  depth <- meanDepth <$> replicateM repetitions oneExperiment
-  printf "Graph size %d\n" size
-  printf "Depth %d\n" (unDepth depth)
+  info <- meanDepth <$> replicateM repetitions oneExperiment
+  putStrLn (pretty info)
+  return info
   where
-    oneExperiment :: IO Depth
+    oneExperiment :: IO (Depth, Weight)
     oneExperiment = do
       gr <- genGraph size
-      let mst = prim' gr
-      return $ treeDepth mst
+      let mst = prim gr
+      return (treeDepth mst, totalWeight mst)
 
-meanDepth :: [Depth] -> Depth
-meanDepth = round @Double . Mean.getMean . foldMap (Mean.new . fromIntegral . unDepth)
+    meanDepth :: [(Depth, Weight)] -> (Depth, Weight)
+    meanDepth xs = bimap (round @Double . Mean.getMean) (Mean.getMean) $ foldMap toMonoid xs
+      where toMonoid (depth, weight) = (Mean.new (fromIntegral depth), Mean.new weight)
+
+    pretty :: (Depth, Weight) -> String
+    pretty (depth, weight) =
+      Ascii.render id id id table
+        where table =  Table
+                (Group NoLine
+                  [ Group NoLine [Header "E1"]
+                  ])
+                (Group DoubleLine
+                  [ Group SingleLine [Header "|V|", Header "|E|", Header "depth", Header "sum of weight"]
+                  ])
+                [[show size, show edges, show depth, show weight]
+                ]
+              edges = (fromIntegral $ size*(size - 1))/2 :: Double
 
 --------------------------------------------------------------
 

@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE RankNTypes #-}
@@ -8,8 +9,33 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE NoStarIsType #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE DerivingVia #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
-module Graph where
+module Graph (
+  -- * Graph
+    UGraph
+  , mkUGraph
+  , genGraph
+  -- * Tree
+  , LTree
+  , type Tree
+  -- * Minimum Spanning Tree
+  , MST
+  , Weight(..)
+  , Depth(..)
+  , prim
+  , prim'
+  , treeDepth
+  , maxWeight
+  , totalWeight
+  -- * Iso
+  , Iso
+  , type (#)
+  ) where
 
 import Control.Monad.IO.Class
 import Control.Monad.ST (ST)
@@ -17,24 +43,43 @@ import Data.Coerce
 import qualified Data.Graph.Inductive as G
 import Data.Graph.Inductive.PatriciaTree (Gr)
 import Data.Kind
-import Data.Semigroup (Max (..))
+import Data.Semigroup (Max (..), Sum(..))
 import qualified System.Random.MWC as R
+import Control.DeepSeq
 
 -- | Given \( n \), returns a complete undirected graph with \( n \) vertices and \( \binom{n}{2} \) edges.
 newtype UGraph = UGraph {unGraph :: Gr () Weight}
+  deriving newtype NFData
 
 type family Iso (a :: Type) :: Type where
   Iso (a, ()) = a
   Iso (a, b) = (a, b)
-
 type (#) a label = Iso (a, label)
 
 newtype LTree label = LTree {unLTree :: [[Int # label]]}
-
+deriving newtype instance Show (Iso (Int, label)) => Show (LTree label)
+deriving newtype instance NFData (Iso (Int, label)) => NFData (LTree label)
 type Tree = LTree ()
 
+{-
+>>> print mst
+[[(1,0.0)],
+ [(9,9.083688e-3),(1,0.0)],
+ [(10,0.24761155),(9,9.083688e-3),(1,0.0)],
+ [(3,0.24981353),(1,0.0)],
+ [(7,1.0946065e-2),(3,0.24981353),(1,0.0)],
+ [(8,0.21356645),(7,1.0946065e-2),(3,0.24981353),(1,0.0)],
+ [(4,0.26288742),(8,0.21356645),(7,1.0946065e-2),(3,0.24981353),(1,0.0)],
+ [(5,2.5864244e-2),(4,0.26288742),(8,0.21356645),(7,1.0946065e-2),(3,0.24981353),(1,0.0)],
+ [(2,0.20782933),(4,0.26288742),(8,0.21356645),(7,1.0946065e-2),(3,0.24981353),(1,0.0)],
+ [(6,0.34417707),(8,0.21356645),(7,1.0946065e-2),(3,0.24981353),(1,0.0)]]
+-}
+newtype MST = MST { unTree :: [[(Int, Weight)]] }
+  deriving newtype (Show, NFData)
+
 newtype Weight = Weight {unWeight :: Float}
-  deriving newtype (Show, Ord, Eq, Num, Enum, Real, Fractional)
+  deriving newtype (Show, Ord, Eq, Num, Enum, Real, Fractional, NFData)
+  deriving (Semigroup, Monoid) via (Sum Float)
 
 instance R.Variate Weight where
   uniform = fmap Weight . R.uniform
@@ -43,8 +88,12 @@ instance R.Variate Weight where
 newtype Depth = Depth {unDepth :: Int}
   deriving newtype (Show, Ord, Eq, Num, Enum, Real, Integral)
 
+-- | From a directed to undirected graph.
+--
+-- Note, it has to create all missing backwards edges.
 mkUGraph :: Gr () Weight -> UGraph
-mkUGraph = UGraph . G.undir -- undir is expensive
+mkUGraph = UGraph . G.undir
+{-# INLINE mkUGraph #-}
 
 type Node = G.LNode ()
 
@@ -55,9 +104,10 @@ type Edge = G.LEdge Weight
 
 mkEdge :: Weight -> Node -> Node -> Edge
 mkEdge weight (u, _) (v, _) = (u, v, weight)
+{-# INLINE mkEdge #-}
 
 genGraph :: (MonadIO m) => Int -> m UGraph
-genGraph n = liftIO $ R.withSystemRandomST genGraph'
+genGraph n = liftIO $ R.withSystemRandom . R.asGenST $ genGraph'
   where
     genGraph' :: forall s. R.Gen s -> ST s UGraph
     genGraph' gen = do
@@ -108,18 +158,22 @@ genGraph n = liftIO $ R.withSystemRandomST genGraph'
 -- msTree :: (Graph gr,Real b) => gr a b -> LRTree b
 -- msTree g = msTreeAt v g where ((_,v,_,_),_) = matchAny g
 -- @
---
--- An output example: @[[1],[4,1],[3,4,1],[2,1],[5,4,1]]@
-prim :: UGraph -> LTree Weight
+prim :: UGraph -> MST
 prim (UGraph gr) = coerce $ G.msTree gr
 
 prim' :: UGraph -> Tree
-prim' = LTree . (fmap . fmap) (\(node, _label) -> node) . unLTree . prim
+prim' = coerce . (fmap . fmap) (\(node, _label) -> node) . unTree . prim
 
-treeDepth :: forall label. LTree label -> Depth
-treeDepth (LTree tree) =
-  coerce @(Max Int) $ foldMap (coerce . length) tree
+treeDepth :: MST -> Depth
+treeDepth = coerce @(Max Int) . foldMap (coerce . length) . coerce @MST @[[Int # Weight]]
 
--- | Returns the edge with maximum weight
-maxWeight :: LTree Weight -> Weight
-maxWeight = maximum . fmap snd . concat . unLTree
+-- | Returns the edge with maximum weight of a MST
+maxWeight :: MST -> Weight
+maxWeight = maximum . fmap snd . concat . coerce @MST @[[Int # Weight]]
+
+-- | Returns the sum of weights of a MST
+totalWeight :: MST -> Weight
+totalWeight =
+  -- Each list contains a branch in ascending order from node to root.
+  -- The first element is the new node.
+  foldMap (snd . head) . coerce @MST @[[Int # Weight]]

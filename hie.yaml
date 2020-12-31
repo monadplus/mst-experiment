@@ -14,3 +14,5 @@ cradle:
           component: "exe:mst-experiment"
         - path: "./test"
           component: "test:mst-experiment-tests"
+        - path: "./benchmark"
+          component: "mst-experiment-bench"

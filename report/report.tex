@@ -27,6 +27,14 @@
 
 \vspace{5ex}
 
+%In addition, you should write one or two pages discussing your experiments in more depth. The discussion should reflect what you have learned from this assignment and might address the following topics.
+
+%* What minimmum spanning tree algorithm did you use, and why?
+%* What is the running time of your algorithm?
+%* If you chose to throw away edges, how did you determine `k(n)`, and how effective was this approach?
+%* Can you give a rought explanation for your results? (The limiting behaviour as `n` grows large can be proven rigorously, but it is very difficult; you need not attempt to prove any exact result.)
+%* Did you have any interesting experiences with the random number generator? Do you trust it?
+
 \begin{algorithm}[H]
   \SetAlgoLined
   \DontPrintSemicolon
@@ -54,6 +62,35 @@
   % \Return{$w$}\;
   \caption{Minimum Spanning Tree Prim's Algorithm}
 \end{algorithm}
+
+
+benchmarked prim/small
+time                 8.100 ms   (7.960 ms .. 8.213 ms)
+                     0.996 R²   (0.991 R² .. 0.999 R²)
+mean                 8.358 ms   (8.278 ms .. 8.505 ms)
+std dev              327.8 μs   (232.6 μs .. 476.6 μs)
+variance introduced by outliers: 14% (moderately inflated)
+
+benchmarking prim/medium ... took 22.24 s, total 56 iterations
+benchmarked prim/medium
+time                 406.0 ms   (401.9 ms .. 410.3 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 391.9 ms   (383.9 ms .. 396.5 ms)
+std dev              10.33 ms   (6.268 ms .. 15.21 ms)
+
+benchmarking prim/big ... took 8.749 s, total 56 iterations
+benchmarked prim/big
+time                 153.6 ms   (151.9 ms .. 155.2 ms)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 150.3 ms   (148.2 ms .. 151.8 ms)
+std dev              3.178 ms   (1.309 ms .. 4.035 ms)
+
+benchmarking prim/bigger ... took 52.57 s, total 56 iterations
+benchmarked prim/bigger
+time                 943.1 ms   (937.4 ms .. 948.9 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 934.4 ms   (920.9 ms .. 940.1 ms)
+std dev              14.24 ms   (4.305 ms .. 23.30 ms)
 
 %%%%%%%%%%%%%%%%%%%%
 \end{document}

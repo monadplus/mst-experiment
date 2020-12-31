@@ -16,4 +16,66 @@ In addition, you should write one or two pages discussing your experiments in mo
 * What is the running time of your algorithm?
 * If you chose to throw away edges, how did you determine `k(n)`, and how effective was this approach?
 * Can you give a rought explanation for your results? (The limiting behaviour as `n` grows large can be proven rigorously, but it is very difficult; you need not attempt to prove any exact result.)
-* Did you have any interesting experiences with teh random number generator? Do you trust it?
+* Did you have any interesting experiences with the random number generator? Do you trust it?
+
+## Installation
+
+This project is build using [GHC](https://www.haskell.org/ghc/)(compiler) and [cabal](https://cabal.readthedocs.io/en/latest/index.html)(build tool).
+
+The easiest way to install both is using [ghcup](https://gitlab.haskell.org/haskell/ghcup-hs)
+
+``` sh
+# Install ghcup
+curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+
+# Install GHC using ghcup
+ghcup install ghc 8.8.4
+
+# Install cabal using ghcup
+ghcup install cabal
+```
+
+Finally, we need to compile the project. This may takes some minutes and requires internet connection. This project does not depend on any `.so` so it should be possible to compile it in any architecture that supports `ghc`.
+
+```sh
+# It may takes some minutes
+$ cabal build
+...
+Preprocessing executable 'mst-experiment' for mst-experiment-0.1.0.0..
+Building executable 'mst-experiment' for mst-experiment-0.1.0.0..
+```
+
+### Alternative Installation
+
+This project is also prepared to be build with [Stack](https://docs.haskellstack.org/en/stable/README/).
+
+Install Stack following the instructions from [here](https://docs.haskellstack.org/en/stable/README/#how-to-install) and then run the following command:
+
+```bash
+$ stack build
+...
+Installing executable mst-experiment in /home/arnau/projects/haskell/mst-experiment/.stack-work/install/x86_64-linux-tinfo6/8e847b3b360c55e4f2b05724757e725ca7f55e7cb74ffe5cc2e613d4fe029b37/8.8.4/bin
+Registering library for mst-experiment-0.1.0.0..
+```
+
+## Usage
+
+Let's start by showing the available options:
+
+```sh
+$ cabal run mst-experiment -- --help
+
+Usage: mst-experiment [(-e|--estimate) | (-n|--size INT) [-r|--repetitions INT]]
+
+Available options:
+  -e,--estimate            Estimate k(n)
+  -n,--size INT            Size of the complete undirected graph
+  -r,--repetitions INT     Number of repetitions of the experiment (default: 5)
+  -h,--help                Show this help text
+```
+
+For example, to run the experiment with a complete undirected graph of 4096 vertices:
+
+```bash
+cabal run mst-experiment --size 4096 --repetitions 1
+```

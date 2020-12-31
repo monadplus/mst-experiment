@@ -2,13 +2,14 @@ module Main where
 
 import Experiment
 import Options.Applicative
+import Data.Functor
 
 main :: IO ()
 main = run =<< execParser opts
   where
     opts = info (programParser <**> helper) fullDesc
 
-    run (RunExperiment config) = runExperiment config
+    run (RunExperiment config) = void $ runExperiment config
     run EstimateK = estimateK
 
 programParser :: Parser ProgramOpts

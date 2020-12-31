@@ -10,9 +10,10 @@ maintainer:          arnauabella@gmail.com
 copyright:           2020 Arnau Abella
 homepage:            https://github.com/monadplus/mst-experiment
 bug-reports:         https://github.com/monadplus/mst-experiment/issues
-synopsis:
-description:
-category:
+synopsis:            Experiment on the MST of a graph.
+description:         This is an experiment on the total weight of the minimum spanning tree of a complete undirected graph with respect to the size of the graph.
+category:            Graph, MST, Experiment
+stability:           experimental
 extra-source-files:  README.md
                      CHANGELOG.md
 tested-with:         GHC == 8.8.4
@@ -59,7 +60,8 @@ Library
                       containers         ^>=0.6,
                       deepseq            ^>=1.4,
                       fgl                ^>=5.7,
-                      mwc-random         ^>=0.15,
+                      mwc-random         ^>=0.14,
+                      tabular            ^>=0.2.0.0,
                       text               ^>=1.2,
 
 Benchmark mst-experiment-bench
