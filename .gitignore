@@ -1,6 +1,19 @@
+# haskell
 .stack-work/
 dist/
 dist-newstyle/
 cabal.project.local
 result
 *~
+
+# latex
+*.out
+*.log
+*.aux
+*.bbl
+*.blg
+*.glo
+*.ist
+*.lof
+*.toc
+_minted-*
