@@ -3,11 +3,13 @@
 ## Introduction
 
 Let the weight of a tree be the sum of the squares of its edges lengths. Given a set of points `P` in the unit square
-let `W(P)` be the weight of the _minimum spanning tree (MST)_ of `P`, where an edge length is the Euclidean distance between its endpoints. If `P` consist of the four corners of the square, then `W(P)= 3`. _Gilbert_ and _Pollack_ proved that `W(P)` is `O(1)` and this was extended to an arbitrary number of dimensions by _Bern_ and _Eppstein_. While more recent divide-and-conquer approaches have show that `W(P) ≤ 4`, no point set is known with `W(P) > 3`, and hence it has been widely conjectured that `W(P) ≤ 3`. Later it was proved that `W(P) < 3.41`.
+let `W(P)` be the weight of the _minimum spanning tree (MST)_ of `P`, where an edge length is the Euclidean distance between its endpoints. If `P` consist of the four corners of the square, then `W(P)= 3`. _Gilbert_ and _Pollack_ proved that `W(P)` is `O(1)` and this was extended to an arbitrary number of dimensions by _Bern_ and _Eppstein_. While more recent divide-and-conquer approaches have show that `W(P) ≤ 4`, no point set is known with `W(P) > 3`, and hence it has been widely conjectured that `W(P) ≤ 3`. Later it was proved that `W(P) < 3.41` \[[1](./proof.pdf)\].
 
 The objective of this empirical experiment is to check if `W(P) < 3.41` holds. In order to the previous theorem, we uniformaly at random generate points in the unite square `P` and compute the weight of the MST of these points. We do this with an increasing number of points in order to explore the solution space.
 
 The results of this experiment can be found in the [report.pdf](./report/report.pdf).
+
+![result's plot](./report/images/plot.svg)
 
 ## Installation
 
