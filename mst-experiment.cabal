@@ -55,7 +55,7 @@ Library
   hs-source-dirs:     src
   exposed-modules:    Graph
                       Experiment
-  other-modules:      Internal.Mean
+  other-modules:      Internal.Statistics
   build-depends:      bytestring         ^>=0.10,
                       containers         ^>=0.6,
                       deepseq            ^>=1.4,

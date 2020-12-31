@@ -1,64 +1,72 @@
-{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE NoStarIsType #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE NoStarIsType #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
-module Graph (
-  -- * Graph
-    UGraph
-  , mkUGraph
-  , genGraph
-  -- * Tree
-  , LTree
-  , type Tree
-  -- * Minimum Spanning Tree
-  , MST
-  , Weight(..)
-  , Depth(..)
-  , prim
-  , prim'
-  , treeDepth
-  , maxWeight
-  , totalWeight
-  -- * Iso
-  , Iso
-  , type (#)
-  ) where
+module Graph
+  ( -- * Graph
+    UGraph,
+    mkUGraph,
+    genGraph,
 
+    -- * Tree
+    LTree,
+    type Tree,
+
+    -- * Minimum Spanning Tree
+    MST,
+    Weight (..),
+    Depth (..),
+    prim,
+    prim',
+    treeDepth,
+    maxWeight,
+    totalWeight,
+
+    -- * Iso
+    Iso,
+    type (#),
+  )
+where
+
+import Control.DeepSeq
 import Control.Monad.IO.Class
 import Control.Monad.ST (ST)
 import Data.Coerce
 import qualified Data.Graph.Inductive as G
 import Data.Graph.Inductive.PatriciaTree (Gr)
 import Data.Kind
-import Data.Semigroup (Max (..), Sum(..))
+import Data.Semigroup (Max (..), Sum (..))
 import qualified System.Random.MWC as R
-import Control.DeepSeq
 
 -- | Given \( n \), returns a complete undirected graph with \( n \) vertices and \( \binom{n}{2} \) edges.
 newtype UGraph = UGraph {unGraph :: Gr () Weight}
-  deriving newtype NFData
+  deriving newtype (NFData)
 
 type family Iso (a :: Type) :: Type where
   Iso (a, ()) = a
   Iso (a, b) = (a, b)
+
 type (#) a label = Iso (a, label)
 
 newtype LTree label = LTree {unLTree :: [[Int # label]]}
+
 deriving newtype instance Show (Iso (Int, label)) => Show (LTree label)
+
 deriving newtype instance NFData (Iso (Int, label)) => NFData (LTree label)
+
 type Tree = LTree ()
 
 {-
@@ -74,11 +82,11 @@ type Tree = LTree ()
  [(2,0.20782933),(4,0.26288742),(8,0.21356645),(7,1.0946065e-2),(3,0.24981353),(1,0.0)],
  [(6,0.34417707),(8,0.21356645),(7,1.0946065e-2),(3,0.24981353),(1,0.0)]]
 -}
-newtype MST = MST { unTree :: [[(Int, Weight)]] }
+newtype MST = MST {unTree :: [[(Int, Weight)]]}
   deriving newtype (Show, NFData)
 
 newtype Weight = Weight {unWeight :: Float}
-  deriving newtype (Show, Ord, Eq, Num, Enum, Real, Fractional, NFData)
+  deriving newtype (Show, Ord, Eq, Num, Enum, Real, RealFrac, Fractional, Floating, NFData)
   deriving (Semigroup, Monoid) via (Sum Float)
 
 instance R.Variate Weight where

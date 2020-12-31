@@ -1,8 +1,8 @@
 module Main where
 
+import Data.Functor
 import Experiment
 import Options.Applicative
-import Data.Functor
 
 main :: IO ()
 main = run =<< execParser opts
@@ -43,4 +43,3 @@ configParser =
           <> showDefault
           <> metavar "INT"
       )
-

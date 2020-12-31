@@ -9,9 +9,8 @@ module Experiment where
 import Control.Monad (replicateM)
 import Data.Coerce
 import Graph
+import Internal.Statistics
 import Text.Printf
-import qualified Internal.Mean as Mean
-import Data.Bifunctor
 import Text.Tabular
 import qualified Text.Tabular.AsciiArt as Ascii
 
@@ -23,35 +22,35 @@ data Config = Config {size :: Int, repetitions :: Int}
 
 --------------------------------------------------------------
 
-runExperiment :: Config -> IO (Depth, Weight)
+runExperiment :: Config -> IO (Statistics Weight)
 runExperiment Config {..} = do
-  info <- meanDepth <$> replicateM repetitions oneExperiment
-  putStrLn (pretty info)
-  return info
+  r <- statistics <$> replicateM repetitions oneExperiment
+  putStrLn (pretty r)
+  return r
   where
-    oneExperiment :: IO (Depth, Weight)
     oneExperiment = do
       gr <- genGraph size
       let mst = prim gr
-      return (treeDepth mst, totalWeight mst)
+      return (totalWeight mst)
 
-    meanDepth :: [(Depth, Weight)] -> (Depth, Weight)
-    meanDepth xs = bimap (round @Double . Mean.getMean) (Mean.getMean) $ foldMap toMonoid xs
-      where toMonoid (depth, weight) = (Mean.new (fromIntegral depth), Mean.new weight)
-
-    pretty :: (Depth, Weight) -> String
-    pretty (depth, weight) =
+    pretty Statistics {..} =
       Ascii.render id id id table
-        where table =  Table
-                (Group NoLine
-                  [ Group NoLine [Header "E1"]
-                  ])
-                (Group DoubleLine
-                  [ Group SingleLine [Header "|V|", Header "|E|", Header "depth", Header "sum of weight"]
-                  ])
-                [[show size, show edges, show depth, show weight]
+      where
+        table =
+          Table
+            ( Group
+                NoLine
+                [ Group NoLine [Header "E1"]
                 ]
-              edges = (fromIntegral $ size*(size - 1))/2 :: Double
+            )
+            ( Group
+                DoubleLine
+                [ Group SingleLine [Header "|V|", Header "|E|", Header "W", Header "Std W"]
+                ]
+            )
+            [ [show _n, show edges, show _mean, show _std]
+            ]
+        edges = (fromIntegral $ _n * (_n - 1)) / 2 :: Double
 
 --------------------------------------------------------------
 
