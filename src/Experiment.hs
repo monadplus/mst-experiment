@@ -3,6 +3,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module Experiment
   ( Config (..),
@@ -28,7 +29,8 @@ import qualified Text.Tabular.AsciiArt as Ascii
 
 data Config = Config
   { size :: Int,
-    repetitions :: Int
+    repetitions :: Int,
+    outputFile :: FilePath
   }
   deriving stock (Show)
 
@@ -45,18 +47,19 @@ data ProgramOpts
 runExperiment :: FilePath -> IO ()
 runExperiment fp = plot fp =<< results
   where
+    outputFile = (baseName fp ++ ".txt")
     results =
       traverse
         singleRun
-        [ Config{ size = 16, repetitions = 20}
-        , Config{ size = 32, repetitions = 20}
-        , Config{ size = 64, repetitions = 20}
-        , Config{ size = 128, repetitions = 20}
-        , Config{ size = 256, repetitions = 10}
-        , Config{ size = 512, repetitions = 5}
-        , Config{ size = 1024, repetitions = 5}
-        , Config{ size = 2048, repetitions = 2}
-        , Config{ size = 4096, repetitions = 2}
+        [ Config{ size = 16, repetitions = 20, outputFile}
+        , Config{ size = 32, repetitions = 20, outputFile}
+        , Config{ size = 64, repetitions = 20, outputFile}
+        , Config{ size = 128, repetitions = 20, outputFile}
+        , Config{ size = 256, repetitions = 10, outputFile}
+        , Config{ size = 512, repetitions = 5, outputFile}
+        , Config{ size = 1024, repetitions = 5, outputFile}
+        , Config{ size = 2048, repetitions = 2, outputFile}
+        , Config{ size = 4096, repetitions = 2, outputFile}
         -- beyond this point it takes too long..
         ]
 
@@ -66,7 +69,9 @@ runExperiment fp = plot fp =<< results
 singleRun :: Config -> IO (Int, Statistics Weight)
 singleRun Config {..} = do
   r <- statistics <$> replicateM repetitions oneExperiment
-  putStrLn (pretty r)
+  let str = pretty r
+  appendFile (baseName outputFile ++ ".txt") str
+  putStrLn str
   return (size, r)
   where
     oneExperiment = do

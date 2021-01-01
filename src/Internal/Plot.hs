@@ -2,6 +2,7 @@
 {-# LANGUAGE RecordWildCards #-}
 module Internal.Plot
   ( plot,
+    baseName
   )
 where
 

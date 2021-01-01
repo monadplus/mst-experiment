@@ -72,3 +72,9 @@ configParser =
           <> showDefault
           <> metavar "INT"
       )
+    <*> strOption
+      ( long "file"
+          <> short 'f'
+          <> help "Output file"
+          <> metavar "FILE"
+      )
