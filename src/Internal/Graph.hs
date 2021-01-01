@@ -14,6 +14,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE NoStarIsType #-}
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# OPTIONS_GHC -Wno-name-shadowing #-}
 
 module Internal.Graph
   ( -- * Graph
@@ -138,14 +139,17 @@ genGraph n = liftIO $ R.withSystemRandom . R.asGenST $ genGraph'
         -- the edges with weight > k(n). The tricky part is computing k(n) which can be estimated running
         -- some simulations on different sizes of graphs.
         filterEdges :: [Edge] -> [Edge]
-        filterEdges
-          | n <= 512 = id
-          | otherwise = filter (\(_, _, w) -> w < k n)
-          where
-            -- On n=512 ==> max weight = 0.011
-            -- On n=1024 ==> max weight = 0.007
-            -- ...
-            k = const 0.1
+        filterEdges =
+          filter (\(_, _, w) -> w < k n) where
+            k n | n <= 16   = 0.3
+                | n <= 32   = 0.2
+                | n <= 64   = 0.1
+                | n <= 128  = 0.08
+                | n <= 256  = 0.06
+                | n <= 512  = 0.04
+                | n <= 1024 = 0.02
+                | n <= 2048 = 0.01
+                | otherwise = 0.01
 
 -- | Prim's Algorithm
 --

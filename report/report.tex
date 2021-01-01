@@ -12,7 +12,7 @@
 
 \title{%
   \vspace{-10ex}
-  RA: An Exploratory Assignment on Minimum Spanning Trees
+  An Exploratory Assignment on Minimum Spanning Trees
 }
 \author{%
   Arnau Abella \\
@@ -27,24 +27,21 @@
 
 \vspace{5ex}
 
-%* If you chose to throw away edges, how did you determine `k(n)`, and how effective was this approach?
-%* Can you give a rought explanation for your results? (The limiting behaviour as `n` grows large can be proven rigorously, but it is very difficult; you need not attempt to prove any exact result.)
-%* Did you have any interesting experiences with the random number generator? Do you trust it?
-
 \section{Introduction}\label{sec:1}
 
-Let the weight of a tree be the sum of the squares of its edges lengths. Given a set of points $P$ in the unit square $I \times I$ let $W(P)$ be the weight of the \textit{minimum spanning tree (MST)} of $P$, where an edge length is the \textit{Euclidean distance} between its endpoints. If $P$ consist of the four corners of the square, then $W(P) = 3$. Gilbert and Pollack \cite{gil68} proved that $W(P)$ is $\mathcal{O}(1)$ and this was extended to an arbitrary number of dimensions by Bern and Eppstein \cite{bern93}. While more recent \textit{divide-and-conquer} approaches have show that $W(P) \leq 4$, no point set is known with $W(P) > 3$, and hence it has been widely conjectured that $W(P) \leq 3$. In 2013, it was proven that $W(P) < 3.41$ \cite{aichholzer2013sum}. Here we show an empirical experiment to check whether $W(P) < 3.41$ holds for any $MST(P)$.
+Let the weight of a tree be the sum of the squares of its edges lengths. Given a set of points $P$ in the unit square $I \times I$, let $W(P)$ be the weight of the \textit{minimum spanning tree (MST)} of $P$, where an edge length is the \textit{Euclidean distance} between its endpoints. If $P$ consist of the four corners of the square, then $W(P) = 3$. Gilbert and Pollack \cite{gil68} proved that $W(P)$ is $\mathcal{O}(1)$ and this was extended to an arbitrary number of dimensions by Bern and Eppstein \cite{bern93}. While more recent \textit{divide-and-conquer} approaches have show that $W(P) \leq 4$, no point set is known with $W(P) > 3$, and hence it has been widely conjectured that $W(P) \leq 3$. In 2013, it was proven that $W(P) < 3.41$ \cite{aichholzer2013sum}. Here we show an empirical experiment to check whether $W(P) < 3.41$ holds for any $MST(P)$.
 
 \section{Experiment}\label{sec:2}
 
-In order to check the previous theorem, we uniformaly at random generate points in the unite square $P$ and compute the weight of the $MST$. We do this with an increasing number of points in order to explore the solution space. It is important to note that the exploration is not exhaustive since exploring the whole solution space would require a large amount of computational power. Also, the implementation is na\"ive since it does not explicitly aims for the degenerate instances where $W(P) \sim 3.41$ may happen.
+In order to check the previous theorem, we generate uniformaly at random points in the unite square $P$ and compute the weight of the $MST$. We do this with an increasing number of points in order to explore the solution space. It is important to note that the exploration is not exhaustive since exploring the whole solution space would require a large amount of computational power and the search does not explicitly aims for the degenerate instances where $W(P) > 3.41$ may happen.
 
-% How the graph is generated
+These random points are generated using a pseudo-random number generator (PRNG) that uses \textit{Marsaglia's MWC256} (also known as \textit{MWC8222}) which has a period of $2^{8222}$ and fares well in tests of randomness. It is also extremely fast, between $2-3$ times faster than the \textit{Mersenne Twister}.
 
-%* What minimmum spanning tree algorithm did you use, and why?
-%* What is the running time of your algorithm?
+\newpage
 
-The it uses \textit{Prim's Algorihm} to search for the $MST$ on the unit square.
+Once the random points are generated, we build a complete undirected graph $G = (V, E)$ where $|V| = n$ and $|E| = \binom{n}{2}$ using an \textit{inductive graph} representation which is efficiently implemented as a \textit{big-endian patricia trees}.
+
+Then, we search the \textit{minimum spanning tree} on the inducive graph using \textit{Prim's algorihm} (see Algorithm \ref{algo:prim}). The inductive implementation has $\mathcal{O}(|V|^2)$ time complexity which could be improved up to $\mathcal{O}(|E| + |V| \log |V|)$ using a \textit{fibonacci heap}.
 
 \begin{algorithm}[H]
   \SetAlgoLined
@@ -69,13 +66,16 @@ The it uses \textit{Prim's Algorihm} to search for the $MST$ on the unit square.
     }
   }
   \caption{Minimum Spanning Tree Prim's Algorithm}
+  \label{algo:prim}
 \end{algorithm}
+
+We emphasise that there are more efficient algorithms such as Karger, Klein and Tarjan linear-time randomized algorithm \cite{karger1995randomized} or Bernand Chazelle almost linear algorithm \cite{chazelle2000minimum} but we decided to use Prim's algorithm because it is the simplest to implement and the performance was good enough for this experiment (see Table \ref{table:1}).
 
 \begin{table}[H]
   \center
   \begin{tabular}{ccccc}
     $|V|$  & Time       & $R^2$   & $\mu$      & $\sigma$    \\ \hline
-    $128$  & $8.1$   ms & $0.996$ & $8.358$ ms & $327.8$ $\mu$ \\
+    $128$  & $8.1$   ms & $0.996$ & $8.358$ ms & $327.8$ $\mu$s \\
     $512 $ & $406.0$ ms & $1.0  $ & $391.9$ ms & $10.33$ ms    \\
     $1024$ & $153.6$ ms & $1.0  $ & $150.3$ ms & $3.178$ ms    \\
     $2048$ & $943.1$ ms & $1.0  $ & $934.4$ ms & $14.24$ ms
@@ -84,14 +84,41 @@ The it uses \textit{Prim's Algorihm} to search for the $MST$ on the unit square.
 \label{table:1}
 \end{table}
 
+One optimization applied to the search is the removal of edges that are unlikely to be used. The minimum spanning tree is unlikely to use any edge of weight greater than $k(n)$ for some function $k(n)$. We estimated the function $k(n)$ by calculating the $MST$ on random graphs of increasing size in the unite square (see Table \ref{table:2}).
+
+\begin{table}[H]
+  \center
+  \begin{tabular}{cc}
+    $|V|$  & $W_{max}$     \\ \hline
+    $16$   & $0.220$ \\
+    $32$   & $0.150$ \\
+    $64$   & $0.060$ \\
+    $128$  & $0.040$ \\
+    $256$  & $0.020$ \\
+    $512$  & $0.013$ \\
+    $1024$ & $0.008$ \\
+    $2048$ & $0.004$ \\
+  \end{tabular}
+  \caption{Estimation of $k(n)$.}
+\label{table:2}
+\end{table}
+
+The code of the experiment is publicly available at \url{https://github.com/monadplus/mst-experiment}.
+
+\section{Results}\label{sec:3}
+
+The experiment was run on a ThinkPad T495 (AMD Ryzen 7 Pro 3700U, $13934$ MiB of RAM, Linux 5.8.10-arch1-1). The experiment was implemented purely in haskell on the Glasgow Haskell Compiler (GHC) 8.8.4. Each execution was repeated between $5$ and $50$ times to bound the deviation of the results. The experiment was run up to $8196$ vertices where the execution time increased up to $30'$ of CPU time and we could not generate reliable results.
+
+The results show that $W(P)$ is $\mathcal{O}(1)$ (see Figure \ref{fig:1}). Note, the deviation decreases when the number of vertices increases. As a conclusion, we  believe that there is no evidence to refute the claim $W(P) < 3.41$.
+
+For future work, the search could be tunned to better explore the degenerate instances which would lead to a stronger position to accept or refute the theorem.
+
 \begin{figure}[H]
   \center
-  \includegraphics[scale=0.5]{plot}
+  \includegraphics[scale=0.4]{plot}
   \caption{Experiment results.}
   \label{fig:1}
 \end{figure}
-
-\section{Results}\label{sec:3}
 
 %%%%%%%%%%%%%%%%%%%%
 

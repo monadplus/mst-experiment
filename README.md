@@ -7,9 +7,7 @@ let `W(P)` be the weight of the _minimum spanning tree (MST)_ of `P`, where an e
 
 The objective of this empirical experiment is to check if `W(P) < 3.41` holds. In order to the previous theorem, we uniformaly at random generate points in the unite square `P` and compute the weight of the MST of these points. We do this with an increasing number of points in order to explore the solution space.
 
-The results of this experiment can be found in the [report.pdf](./report/report.pdf).
-
-![result's plot](./report/images/plot.svg)
+The results of this experiment can be found in the [report](./report/report.pdf).
 
 ## Installation
 
