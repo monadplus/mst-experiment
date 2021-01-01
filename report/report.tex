@@ -107,9 +107,27 @@ The code of the experiment is publicly available at \url{https://github.com/mona
 
 \section{Results}\label{sec:3}
 
-The experiment was run on a ThinkPad T495 (AMD Ryzen 7 Pro 3700U, $13934$ MiB of RAM, Linux 5.8.10-arch1-1). The experiment was implemented purely in haskell on the Glasgow Haskell Compiler (GHC) 8.8.4. Each execution was repeated between $5$ and $50$ times to bound the deviation of the results. The experiment was run up to $8196$ vertices where the execution time increased up to $30'$ of CPU time and we could not generate reliable results.
+The experiment was run on a ThinkPad T495 (AMD Ryzen 7 Pro 3700U, $13934$ MiB of RAM, Linux 5.8.10-arch1-1). The experiment was implemented purely in haskell on the Glasgow Haskell Compiler (GHC) 8.8.4. The experiment was run up to $8196$ vertices where the execution time increased up to $30'$ of CPU time and we could not generate reliable results.
 
-The results show that $W(P)$ is $\mathcal{O}(1)$ (see Figure \ref{fig:1}). Note, the deviation decreases when the number of vertices increases. As a conclusion, we  believe that there is no evidence to refute the claim $W(P) < 3.41$.
+\begin{table}[H]
+  \center
+  \begin{tabular}{ccccc}
+    $|V|$  & $\mu_W$    & $\sigma_W$ \\ \hline
+    $16$   & $1.1067605$ & $0.21767415$ \\
+    $32$   & $1.1015033$ & $0.20797518$ \\
+    $64$   & $1.2079728$ & $0.12993012$ \\
+    $128$  & $1.1780577$ & $0.10956229$ \\
+    $256$  & $1.2000419$ & $0.08088318$ \\
+    $512$  & $1.1488761$ & $0.02073750$ \\
+    $1024$ & $1.2366604$ & $0.05549732$ \\
+    $2048$ & $1.2135003$ & $0.00306511$ \\
+    $4096$ & $1.1810393$ & $0.01102620$
+  \end{tabular}
+\caption{Experiment results.}
+\label{table:3}
+\end{table}
+
+The results show that $W(P)$ is $\mathcal{O}(1)$ (see Table \ref{table:3} and Figure \ref{fig:1}). Note, the deviation decreases when the number of vertices increases. As a conclusion, we  believe that there is no evidence to refute the claim $W(P) < 3.41$.
 
 For future work, the search could be tunned to better explore the degenerate instances which would lead to a stronger position to accept or refute the theorem.
 

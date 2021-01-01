@@ -56,7 +56,7 @@ runExperiment fp = plot fp =<< results
         , Config{ size = 512, repetitions = 5}
         , Config{ size = 1024, repetitions = 5}
         , Config{ size = 2048, repetitions = 2}
-        , Config{ size = 4096, repetitions = 1}
+        , Config{ size = 4096, repetitions = 2}
         -- beyond this point it takes too long..
         ]
 
